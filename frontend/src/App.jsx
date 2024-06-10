@@ -5,12 +5,13 @@ function App() {
   const [inputFile, setInputFile] = useState(undefined);
   const [imageUrl, setImageUrl] = useState("");
   const [uploadStatus, setUploadStatus] = useState(false);
+  const [filename, setFilename] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append("image", inputFile);
-    const url = "http://localhost:5000/images";
+    formData.append("file", inputFile);
+    const url = "http://localhost:5000/upload";
     const response = await fetch(url, {
       method: "POST",
       body: formData,
@@ -19,17 +20,15 @@ function App() {
     if (data.status === "ok") {
       setUploadStatus((prev) => !prev);
     }
-    // console.log(data);
   };
 
   const getPhoto = async (e) => {
     e.preventDefault();
-    const url = "http://localhost:5000/get-image";
+    const url = `http://localhost:5000/get-file?filename=${filename}`;
     const response = await fetch(url);
     const data = await response.blob();
     const imageUrl = URL.createObjectURL(data);
     setImageUrl((prevValue) => imageUrl);
-    // console.log(data);
   };
 
   return (
@@ -37,7 +36,7 @@ function App() {
       <div>
         <form onSubmit={handleSubmit}>
           <input
-            name="image"
+            name="file"
             type="file"
             onChange={(e) => {
               setInputFile(e.target.files[0]);
@@ -49,6 +48,11 @@ function App() {
       <div>{uploadStatus ? "Upload success" : ""}</div>
       <div>
         <form onSubmit={getPhoto}>
+          <input
+            type="text"
+            onChange={(e) => setFilename(e.target.value)}
+            name="filename"
+          />
           <input type="submit" value="get file" />
         </form>
         <img src={imageUrl} alt="sample-img" />
