@@ -1,15 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
-const path = require("path");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "assets");
+    cb(null, "uploads");
   },
   filename: function (req, file, cb) {
-    // console.log(file);
-    cb(null, "sample" + path.extname(file.originalname));
+    cb(null, file.originalname);
   },
 });
 
@@ -22,13 +20,13 @@ app.get("/", (req, res) => {
   res.json({ status: "ok" });
 });
 
-app.post("/images", upload.single("image"), (req, res) => {
-  // console.log(req.file);
+app.post("/upload", upload.single("file"), (req, res) => {
   res.json({ status: "ok" });
 });
 
-app.get("/get-image", (req, res) => {
-  res.sendFile(__dirname + "/assets/sample.jpg");
+app.get("/get-file", (req, res) => {
+  const filename = req.query.filename;
+  res.sendFile(__dirname + `/uploads/${filename}`);
 });
 
 const PORT = 5000;
